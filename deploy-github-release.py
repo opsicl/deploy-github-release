@@ -62,14 +62,11 @@ print(tag,asset)
 
 try:
     release_file = open(path + '/release.txt', 'r+')
-except: 
-    release_file = open(path + '/release.txt', 'w')
-try:
     current_release = json.load(release_file)
+    release_file.close()
 except:
     current_release = { 'tag': '' }
 if new_release['tag'] != current_release['tag']:
     deploy(new_release['asset'])
-    release_file.seek(0)
+    release_file = open(path + '/release.txt', 'w')
     json.dump(new_release,release_file)
-    release_file.truncate()
