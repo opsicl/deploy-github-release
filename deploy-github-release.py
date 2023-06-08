@@ -23,6 +23,8 @@ parser.add_argument('-t', '--token',\
 parser.add_argument('-d', '--deploy-path', required=True,\
         help='Github token',  metavar='deploy_path')
 
+parser.add_argument('-p', '--post-exec',\
+        help='Post exec command', required=False)
 
 
 args = parser.parse_args()
@@ -32,6 +34,7 @@ repo = args.repo
 token = args.token
 path = args.deploy_path
 version_tag = args.version_tag
+post_exec_cmd = args.post_exec
 
 
 def deploy(asset):
@@ -47,6 +50,12 @@ def deploy(asset):
         print(e)
         exit(1)
 
+def post_exec(cmd):
+    try:
+        subprocess.run(cmd)
+    except Exception as e:
+        print(e)
+        exit(1)
 
 url = 'https://api.github.com/repos/{}/{}/releases/{}'.format(org, repo, version_tag)
 headers = {'Authorization': 'token %s' % token}
@@ -68,5 +77,7 @@ except:
     current_release = { 'tag': '' }
 if new_release['tag'] != current_release['tag']:
     deploy(new_release['asset'])
+    if post_exec_cmd:
+        post_exec(post_exec_cmd.split())
     release_file = open(path + '/release.txt', 'w')
     json.dump(new_release,release_file)
