@@ -5,7 +5,6 @@ import json
 import subprocess
 from sys import exit
 import argparse
-import os
 
 parser = argparse.ArgumentParser()
 
