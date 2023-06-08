@@ -30,7 +30,7 @@ parser.add_argument('-z', '--unzip',\
         help='Unzip asset', default=True, required=False)
 
 parser.add_argument('-tp', '--tmp-path',\
-        help='Temp path for asset', default="/tmp/release.zip", required=False, metavar='tmp_path')
+        help='Temp path for asset', default="/tmp, required=False, metavar='tmp_path')
 
 
 args = parser.parse_args()
@@ -46,8 +46,9 @@ unzip = args.unzip
 env_vars = {}
 
 def download_asset(asset):
+    zip_path = tmp_path + "/release.zip"
     try:
-        subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', tmp_path, '-nv'])
+        subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', zip_path, '-nv'])
         env_vars["name"] = asset
         env_vars["version"] = version_tag
         env_vars["path"] = tmp_path
@@ -56,13 +57,15 @@ def download_asset(asset):
         exit(1)
         
 def unzip_asset(path):
+    release_tmp_path = tmp_path + "/release"
+    zip_path = tmp_path + "/release.zip"
     try:
-        subprocess.run(['/bin/rm', '-rf', '/tmp/release'])
-        subprocess.run(['/bin/mkdir', '-p', '/tmp/release'])
-        subprocess.run(['/usr/bin/unzip', '-o', tmp_path, '-d', '/tmp/release'])
-        subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', '/tmp/release/', path ])
-        subprocess.run(['/bin/rm', '-rf', tmp_path])
-        subprocess.run(['/bin/rm', '-rf', '/tmp/release'])
+        subprocess.run(['/bin/rm', '-rf', release_tmp_path])
+        subprocess.run(['/bin/mkdir', '-p', release_tmp_path])
+        subprocess.run(['/usr/bin/unzip', '-o', zip_path, '-d', release_tmp_path])
+        subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path, path ])
+        subprocess.run(['/bin/rm', '-rf', zip_path])
+        subprocess.run(['/bin/rm', '-rf', release_tmp_path])
         env_vars["path"] = path
     except Exception as e:
         print(e)
