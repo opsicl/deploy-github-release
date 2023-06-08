@@ -29,6 +29,9 @@ parser.add_argument('-p', '--post-exec',\
 parser.add_argument('-z', '--unzip',\
         help='Unzip asset', default=True, required=False)
 
+parser.add_argument('-tp', '--tmp-path',\
+        help='Temp path for asset', default="/tmp/release.zip", required=False, metavar='tmp_path')
+
 
 args = parser.parse_args()
 
@@ -47,6 +50,7 @@ def download_asset(asset):
         subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', '/tmp/release.zip', '-nv'])
         env_vars["name"] = asset
         env_vars["version"] = version_tag
+        env_vars["path"] = tmp_path
     except Exception as e:
         print(e)
         exit(1)
@@ -62,7 +66,7 @@ def unzip_asset(path):
         env_vars["path"] = path
     except Exception as e:
         print(e)
-        exit(1) 
+        exit(1)
 
 def post_exec(cmd):
     try:
