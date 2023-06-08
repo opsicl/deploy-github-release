@@ -47,7 +47,7 @@ env_vars = {}
 
 def download_asset(asset):
     try:
-        subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', '/tmp/release.zip', '-nv'])
+        subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', tmp_path, '-nv'])
         env_vars["name"] = asset
         env_vars["version"] = version_tag
         env_vars["path"] = tmp_path
@@ -59,9 +59,9 @@ def unzip_asset(path):
     try:
         subprocess.run(['/bin/rm', '-rf', '/tmp/release'])
         subprocess.run(['/bin/mkdir', '-p', '/tmp/release'])
-        subprocess.run(['/usr/bin/unzip', '-o', '/tmp/release.zip', '-d', '/tmp/release'])
+        subprocess.run(['/usr/bin/unzip', '-o', tmp_path, '-d', '/tmp/release'])
         subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', '/tmp/release/', path ])
-        subprocess.run(['/bin/rm', '-rf', '/tmp/release.zip'])
+        subprocess.run(['/bin/rm', '-rf', tmp_path])
         subprocess.run(['/bin/rm', '-rf', '/tmp/release'])
         env_vars["path"] = path
     except Exception as e:
