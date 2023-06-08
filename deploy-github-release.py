@@ -30,7 +30,7 @@ parser.add_argument('-z', '--unzip',\
         help='Unzip asset', default=True, required=False)
 
 parser.add_argument('-tp', '--tmp-path',\
-        help='Temp path for asset', default="/tmp, required=False, metavar='tmp_path')
+        help='Temp path for asset', default='/tmp', required=False, metavar='tmp_path')
 
 
 args = parser.parse_args()
