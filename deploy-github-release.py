@@ -5,6 +5,7 @@ import json
 import subprocess
 from sys import exit
 import argparse
+import os
 
 parser = argparse.ArgumentParser()
 
@@ -20,11 +21,14 @@ parser.add_argument('-v', '--version-tag', default='latest',\
 parser.add_argument('-t', '--token',\
         help='Github token', required=True)
 
-parser.add_argument('-d', '--deploy-path', required=True,\
+parser.add_argument('-d', '--deploy-path', required=False,\
         help='Github token',  metavar='deploy_path')
 
 parser.add_argument('-p', '--post-exec',\
         help='Post exec command', required=False)
+
+parser.add_argument('-z', '--unzip',\
+        help='Unzip asset', default=True, required=False)
 
 
 args = parser.parse_args()
@@ -35,24 +39,35 @@ token = args.token
 path = args.deploy_path
 version_tag = args.version_tag
 post_exec_cmd = args.post_exec
+unzip = args.unzip
 
+env_vars = {}
 
-def deploy(asset):
+def download_asset(asset):
     try:
         subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', '/tmp/release.zip', '-nv'])
+        env_vars["name"] = asset
+        env_vars["version"] = version_tag
+    except Exception as e:
+        print(e)
+        exit(1)
+        
+def unzip_asset(path):
+    try:
         subprocess.run(['/bin/rm', '-rf', '/tmp/release'])
         subprocess.run(['/bin/mkdir', '-p', '/tmp/release'])
         subprocess.run(['/usr/bin/unzip', '-o', '/tmp/release.zip', '-d', '/tmp/release'])
         subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', '/tmp/release/', path ])
         subprocess.run(['/bin/rm', '-rf', '/tmp/release.zip'])
         subprocess.run(['/bin/rm', '-rf', '/tmp/release'])
+        env_vars["path"] = path
     except Exception as e:
         print(e)
-        exit(1)
+        exit(1) 
 
 def post_exec(cmd):
     try:
-        subprocess.run(cmd)
+        subprocess.run(cmd, env=env_vars, shell=True)
     except Exception as e:
         print(e)
         exit(1)
@@ -76,8 +91,10 @@ try:
 except:
     current_release = { 'tag': '' }
 if new_release['tag'] != current_release['tag']:
-    deploy(new_release['asset'])
+    download_asset(new_release['asset'])
+    if unzip and path:
+        unzip_asset(asset)
     if post_exec_cmd:
-        post_exec(post_exec_cmd.split())
+        post_exec(post_exec_cmd)
     release_file = open(path + '/release.txt', 'w')
     json.dump(new_release,release_file)
