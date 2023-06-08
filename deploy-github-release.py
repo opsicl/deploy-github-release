@@ -21,7 +21,7 @@ parser.add_argument('-t', '--token',\
         help='Github token', required=True)
 
 parser.add_argument('-d', '--deploy-path', required=False,\
-        help='Github token',  metavar='deploy_path')
+        help='Deploy asset path',  metavar='deploy_path')
 
 parser.add_argument('-p', '--post-exec',\
         help='Post exec command', required=False)
