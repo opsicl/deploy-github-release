@@ -100,7 +100,7 @@ except:
 if new_release['tag'] != current_release['tag']:
     download_asset(new_release['asset'])
     if unzip and path:
-        unzip_asset(asset)
+        unzip_asset(path)
     if post_exec_cmd:
         post_exec(post_exec_cmd)
     release_file = open(path + '/release.txt', 'w')
