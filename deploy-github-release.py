@@ -42,6 +42,7 @@ path = args.deploy_path
 version_tag = args.version_tag
 post_exec_cmd = args.post_exec
 unzip = args.unzip
+tmp_path = args.tmp_path
 
 env_vars = {}
 
