@@ -27,7 +27,7 @@ parser.add_argument('-p', '--post-exec',\
         help='Post exec command', required=False)
 
 parser.add_argument('-z', '--unzip',\
-        help='Unzip asset', default=True, required=False)
+        help='Unzip asset', choices=['true','false'], default='true', required=False)
 
 parser.add_argument('-tp', '--tmp-path',\
         help='Temp path for asset', default='/tmp', required=False, metavar='tmp_path')
@@ -99,7 +99,7 @@ except:
     current_release = { 'tag': '' }
 if new_release['tag'] != current_release['tag']:
     download_asset(new_release['asset'])
-    if unzip and path:
+    if unzip.lower() == 'true' and path:
         unzip_asset(path)
     if post_exec_cmd:
         post_exec(post_exec_cmd)
