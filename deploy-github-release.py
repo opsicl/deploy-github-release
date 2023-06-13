@@ -27,10 +27,13 @@ parser.add_argument('-p', '--post-exec',\
         help='Post exec command', required=False)
 
 parser.add_argument('-z', '--unzip',\
-        help='Unzip asset', default=True, required=False)
+        help='Unzip asset', action='store_true', required=False)
 
 parser.add_argument('-tp', '--tmp-path',\
         help='Temp path for asset', default='/tmp', required=False, metavar='tmp_path')
+
+parser.add_argument('-rd', '--release-dir',\
+        help='Name of the asset directory after unzip', required=False, metavar='release_dir')
 
 
 args = parser.parse_args()
@@ -43,6 +46,7 @@ version_tag = args.version_tag
 post_exec_cmd = args.post_exec
 unzip = args.unzip
 tmp_path = args.tmp_path
+release_dir = args.release_dir
 
 env_vars = {}
 
@@ -64,7 +68,7 @@ def unzip_asset(path):
         subprocess.run(['/bin/rm', '-rf', release_tmp_path])
         subprocess.run(['/bin/mkdir', '-p', release_tmp_path])
         subprocess.run(['/usr/bin/unzip', '-o', zip_path, '-d', release_tmp_path])
-        subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path, path ])
+        subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + release_dir, path ])
         subprocess.run(['/bin/rm', '-rf', zip_path])
         subprocess.run(['/bin/rm', '-rf', release_tmp_path])
         env_vars["path"] = path
