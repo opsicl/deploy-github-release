@@ -53,6 +53,7 @@ env_vars = {}
 def download_asset(asset):
     zip_path = tmp_path + "/release.zip"
     try:
+        subprocess.run(['/bin/mkdir', '-p', tmp_path])
         subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', zip_path, '-nv'])
         env_vars["name"] = asset
         env_vars["version"] = version_tag
