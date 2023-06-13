@@ -74,7 +74,7 @@ def unzip_asset(path):
         if release_dir:
             subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + release_dir, assets_path])
         else:
-            subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + "/", path ])
+            subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + "/", assets_path ])
         subprocess.run(['/bin/rm', '-rf', zip_path])
         subprocess.run(['/bin/rm', '-rf', release_tmp_path])
         env_vars["path"] = path
