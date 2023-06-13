@@ -33,7 +33,7 @@ parser.add_argument('-tp', '--tmp-path',\
         help='Temp path for asset', default='/tmp', required=False, metavar='tmp_path')
 
 parser.add_argument('-rd', '--release-dir',\
-        help='Name of the asset directory after unzip', default = "/", required=False, metavar='release_dir')
+        help='Name of the asset directory after unzip', required=False, metavar='release_dir')
 
 
 args = parser.parse_args()
@@ -68,7 +68,10 @@ def unzip_asset(path):
         subprocess.run(['/bin/rm', '-rf', release_tmp_path])
         subprocess.run(['/bin/mkdir', '-p', release_tmp_path])
         subprocess.run(['/usr/bin/unzip', '-o', zip_path, '-d', release_tmp_path])
-        subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + release_dir, path ])
+        if release_dir:
+            subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + release_dir, path ])
+        else:
+            subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path, path ])
         subprocess.run(['/bin/rm', '-rf', zip_path])
         subprocess.run(['/bin/rm', '-rf', release_tmp_path])
         env_vars["path"] = path
