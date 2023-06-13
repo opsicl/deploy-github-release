@@ -33,7 +33,7 @@ parser.add_argument('-tp', '--tmp-path',\
         help='Temp path for asset', default='/tmp', required=False, metavar='tmp_path')
 
 parser.add_argument('-rd', '--release-dir',\
-        help='Name of the asset directory after unzip', required=False, metavar='release_dir')
+        help='Name of the asset directory after unzip', default = "/", required=False, metavar='release_dir')
 
 
 args = parser.parse_args()
