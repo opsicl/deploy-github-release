@@ -65,12 +65,14 @@ def download_asset(asset):
 def unzip_asset(path):
     release_tmp_path = tmp_path + "/release"
     zip_path = tmp_path + "/release.zip"
+    assets_path = path + "/assets"
     try:
         subprocess.run(['/bin/rm', '-rf', release_tmp_path])
         subprocess.run(['/bin/mkdir', '-p', release_tmp_path])
+        subprocess.run(['/bin/mkdir', '-p', assets_path])
         subprocess.run(['/usr/bin/unzip', '-o', zip_path, '-d', release_tmp_path])
         if release_dir:
-            subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + release_dir, path ])
+            subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + release_dir, assets_path])
         else:
             subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + "/", path ])
         subprocess.run(['/bin/rm', '-rf', zip_path])
