@@ -42,7 +42,6 @@ version_tag = args.version_tag
 post_exec_cmd = args.post_exec
 unzip = args.unzip
 tmp_path = args.tmp_path
-release_dir = args.release_dir
 
 env_vars = {}
 
