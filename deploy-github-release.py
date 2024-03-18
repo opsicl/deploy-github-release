@@ -32,6 +32,9 @@ parser.add_argument('-z', '--unzip',\
 parser.add_argument('-tp', '--tmp-path',\
         help='Temp path for asset', default='/tmp', required=False, metavar='tmp_path')
 
+parser.add_argument('-an', '--asset-name',\
+        help='Name of the asset you want to download', required=False, metavar='asset_name')
+
 args = parser.parse_args()
 
 org = args.organization
@@ -42,10 +45,12 @@ version_tag = args.version_tag
 post_exec_cmd = args.post_exec
 unzip = args.unzip
 tmp_path = args.tmp_path
+an = args.asset_name
 
 env_vars = {}
 
 def download_asset(asset):
+    print("download")
     zip_path = tmp_path + "/release.zip"
     try:
         subprocess.run(['/bin/mkdir', '-p', tmp_path])
@@ -75,6 +80,7 @@ def unzip_asset(path):
         exit(1)
 
 def post_exec(cmd):
+    print("post exec")
     try:
         subprocess.run(cmd, env=env_vars, shell=True)
     except Exception as e:
@@ -88,7 +94,15 @@ response = requests.get(url,headers=headers).json()
 #print(response.json())
 
 tag = response['tag_name']
+
+# get a specific asset, or get the first one by default
+assets = response['assets']
 asset = response['assets'][0]['url']
+if an:
+    for asset_obj in assets:
+        if asset_obj['name'] == an:
+            asset = asset_obj['url']
+
 new_release = { 'tag': tag, 'asset': asset }
 print(tag,asset)
 
