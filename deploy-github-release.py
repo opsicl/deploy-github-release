@@ -53,8 +53,8 @@ def download_asset(asset):
     print("download")
     zip_path = tmp_path + "/release.zip"
     try:
-        subprocess.run(['/bin/mkdir', '-p', tmp_path])
-        subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', zip_path, '-nv'])
+        subprocess.run(['/bin/mkdir', '-p', tmp_path], check=True)
+        subprocess.run(['/usr/bin/wget', '--header', 'Accept: application/octet-stream','--header','Authorization: token %s' % token, asset, '-O', zip_path, '-nv'], check=True)
         env_vars["name"] = asset
         env_vars["version"] = version_tag
         env_vars["path"] = tmp_path
@@ -67,13 +67,13 @@ def unzip_asset(path):
     zip_path = tmp_path + "/release.zip"
     assets_path = path + "/assets"
     try:
-        subprocess.run(['/bin/rm', '-rf', release_tmp_path])
-        subprocess.run(['/bin/mkdir', '-p', release_tmp_path])
-        subprocess.run(['/bin/mkdir', '-p', assets_path])
-        subprocess.run(['/usr/bin/unzip', '-o', zip_path, '-d', release_tmp_path])
-        subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + "/", assets_path ])
-        subprocess.run(['/bin/rm', '-rf', zip_path])
-        subprocess.run(['/bin/rm', '-rf', release_tmp_path])
+        subprocess.run(['/bin/rm', '-rf', release_tmp_path], check=True)
+        subprocess.run(['/bin/mkdir', '-p', release_tmp_path], check=True)
+        subprocess.run(['/bin/mkdir', '-p', assets_path], check=True)
+        subprocess.run(['/usr/bin/unzip', '-o', zip_path, '-d', release_tmp_path], check=True)
+        subprocess.run(['/usr/bin/rsync', '-aHvxr', '--delete', release_tmp_path + "/", assets_path ], check=True)
+        subprocess.run(['/bin/rm', '-rf', zip_path], check=True)
+        subprocess.run(['/bin/rm', '-rf', release_tmp_path], check=True)
         env_vars["path"] = path
     except Exception as e:
         print(e)
@@ -82,29 +82,34 @@ def unzip_asset(path):
 def post_exec(cmd):
     print("post exec")
     try:
-        subprocess.run(cmd, env=env_vars, shell=True)
+        subprocess.run(cmd, env=env_vars, shell=True, check=True)
     except Exception as e:
         print(e)
         exit(1)
 
-url = 'https://api.github.com/repos/{}/{}/releases/{}'.format(org, repo, version_tag)
-headers = {'Authorization': 'token %s' % token}
-response = requests.get(url,headers=headers).json()
+try:
+    url = 'https://api.github.com/repos/{}/{}/releases/{}'.format(org, repo, version_tag)
+    headers = {'Authorization': 'token %s' % token}
+    response = requests.get(url,headers=headers).json()
 
-#print(response.json())
+    #print(response.json())
 
-tag = response['tag_name']
+    tag = response['tag_name']
 
-# get a specific asset, or get the first one by default
-assets = response['assets']
-asset = response['assets'][0]['url']
-if an:
-    for asset_obj in assets:
-        if asset_obj['name'] == an:
-            asset = asset_obj['url']
+    # get a specific asset, or get the first one by default
+    assets = response['assets']
+    asset = response['assets'][0]['url']
+    if an:
+        for asset_obj in assets:
+            if asset_obj['name'] == an:
+                asset = asset_obj['url']
 
-new_release = { 'tag': tag, 'asset': asset }
-print(tag,asset)
+    new_release = { 'tag': tag, 'asset': asset }
+    print(tag,asset)
+
+except Exception as e:
+    print("Could not get github asset: ", e)
+    exit(1)
 
 
 try:
